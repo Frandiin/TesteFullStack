@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model products {
+  id             Int       @id @default(autoincrement())
+  name           String    @db.VarChar(255)
+  reference      String    @db.VarChar(30)
+  price          Int?
+  category       String?   @db.VarChar(50)
+  description    String?   @db.VarChar(8000)
+  brand          String?   @db.VarChar(100)
+  gender         String?   @db.VarChar(50)
+  stock          Int?
+  type           String?   @db.VarChar(255)
+  subcategory    String?   @db.VarChar(50)
+  prompt_delivery Boolean   @db.TinyInt
+  company_id     Int?
+  id_erp         String?   @db.VarChar(80)
+  brand_id       String?   @db.VarChar(100)
+  deadline_id    Int?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime? @updatedAt
+  deleted        Boolean?  @db.TinyInt
+  variant_id     Int?
+  colors         colors[]
+  images         images[]
+  skus          skus[]
+}
+
+model colors {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(50)
+  rgb        String?   @db.VarChar(11)
+  hex_code   String?   @db.VarChar(10)
+  deleted    Boolean?  @db.TinyInt
+  product_id Int
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+  product    products   @relation(fields: [product_id], references: [id])
+}
+
+model images {
+  id          Int       @id @default(autoincrement())
+  path        String    @db.VarChar(255)
+  order       Int       @db.TinyInt
+  product_id  Int
+  created_at  DateTime  @default(now())
+  deleted     Boolean?  @db.TinyInt
+  updated_at  DateTime? @updatedAt
+  company_key String?   @db.VarChar(4)
+  product     products   @relation(fields: [product_id], references: [id])
+}
+
+model brands {
+  id                     Int       @id @default(autoincrement())
+  name                   String    @db.VarChar(45)
+  created_at             DateTime  @default(now())
+  updated_at            DateTime? @updatedAt
+  deleted_at            DateTime?
+  company_id            Int
+  min_value             Float?
+  min_installments_value Float?
+  order_skus            String?   @db.VarChar(100)
+  visible               Boolean?  @db.TinyInt
+  deleted               Boolean?  @db.TinyInt
+  cnpj                  String?   @db.VarChar(14)
+  company               companies   @relation(fields: [company_id], references: [id])
+}
+
+model companies {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(100)
+  mail       String?   @db.Text
+  cnpj       String?   @db.VarChar(14)
+  key        Int
+  login      String    @db.VarChar(150)
+  pass       String    @db.VarChar(200)
+  api_key    String    @db.VarChar(45)
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+  deleted    Boolean?  @db.TinyInt
+  brands     brands[]
+}
+
+model skus {
+  id           Int       @id @default(autoincrement())
+  size         String    @db.VarChar(10)
+  stock        BigInt
+  product_id   Int
+  min_quantity Int
+  deleted      Boolean?  @db.TinyInt
+  open_grid    Boolean   @db.TinyInt
+  created_at   DateTime  @default(now())
+  updated_at   DateTime? @updatedAt
+  id_erp       String?   @db.VarChar(50)
+  product      products   @relation(fields: [product_id], references: [id])
+}
